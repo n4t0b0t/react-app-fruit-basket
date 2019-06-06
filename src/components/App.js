@@ -1,26 +1,55 @@
 import React from "react";
-import logo from "../assets/logo.svg";
+import FilteredList from "./FilteredList";
 import "../styles/App.css";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      text: null,
+      fruits: []
+    };
+    this.url =
+      "https://my-json-server.typicode.com/thoughtworks-jumpstart/api/fruits";
+  }
+
+  handleChange = event => {
+    this.setState({ text: event.target.value });
+  };
+
+  async componentDidMount() {
+    try {
+      const response = await fetch(this.url);
+
+      if (!response.ok) {
+        throw new Error("Something bad happened!");
+      }
+
+      const fruits = await response.json();
+      this.setState({ fruits });
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  render() {
+    return (
+      <div>
+        <h1>React Fruit Basket</h1>
+        <input
+          type="text"
+          placeholder="search for fruits here!"
+          onChange={this.handleChange}
+        />
+        <h2>
+          Currently Searching: {!this.state.text ? "..." : this.state.text}
+        </h2>
+        <ul>
+          <FilteredList list={this.state.fruits} text={this.state.text} />
+        </ul>
+      </div>
+    );
+  }
 }
 
 export default App;
